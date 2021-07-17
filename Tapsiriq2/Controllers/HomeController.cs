@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,11 @@ namespace Tapsiriq2.Controllers
         [HttpGet]
         public IActionResult CreatUser()
         {
+            if (HttpContext.Session.GetString("username") == null)
+            {
+                return Redirect("/account/login");
+            }
+
             return View();
         }
         [HttpPost]
@@ -42,7 +48,12 @@ namespace Tapsiriq2.Controllers
         [HttpGet]
         public IActionResult UserList()
         {
-            var json=System.IO.File.ReadAllText(@"User.json");
+            if (HttpContext.Session.GetString("username") == null)
+            {
+                return Redirect("/account/login");
+            }
+
+            var json=System.IO.File.ReadAllText("User.json");
             
             var users = JsonConvert.DeserializeObject<List<User>>(json);
             if (users==null)
@@ -51,12 +62,17 @@ namespace Tapsiriq2.Controllers
             }
             return View(users);
         }
+        public IActionResult Index()
+        {
+            return View();
+        }
 
         public void WriteToJsonFile(List<User> users)
         {
             var json = JsonConvert.SerializeObject(users);
             System.IO.File.WriteAllText(@"User.json", json);
         }
+       
     }
     
 }

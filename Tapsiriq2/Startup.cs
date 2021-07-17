@@ -18,7 +18,11 @@ namespace Tapsiriq2
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddMvc();
+            services.AddSession(option =>
+            {
+                option.IdleTimeout = TimeSpan.FromMinutes(5);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,12 +47,18 @@ namespace Tapsiriq2
                 RequestPath = "/modules"
             });
             app.UseRouting();
-
+            app.UseSession();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                //endpoints.MapControllerRoute(
+                //    name: "login",
+                //    pattern: "account/login",
+                //    defaults: new { controller = "account", action = "login" }
+                //    );
                 endpoints.MapControllerRoute(
                     name:"default",
-                    pattern: "{controller=home}/{action=CreatUser}/{id?}"
+                    pattern: "{controller=home}/{action=index}/{id?}"
                     );
             });
         }
